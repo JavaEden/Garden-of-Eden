@@ -3,6 +3,7 @@ package com.eden.garden;
 import com.caseyjbrooks.eden.Eden;
 import com.caseyjbrooks.eden.bible.Bible;
 import com.caseyjbrooks.eden.bible.BibleList;
+import com.caseyjbrooks.eden.bible.Reference;
 import com.eden.americanbiblesociety.ABSBible;
 import com.eden.americanbiblesociety.ABSBibleList;
 import com.eden.digitalbibleplatform.DBPBible;
@@ -39,6 +40,38 @@ public class BibleController {
             myBible.download();
 
             return myBible;
+        }
+
+        return null;
+    }
+
+    @RequestMapping("/parse")
+    public Reference parse(@RequestParam(value="service", defaultValue="abs") String service,
+                          @RequestParam(value="id", defaultValue="eng-ESV") String id,
+                       @RequestParam(value="input", defaultValue="") String input) {
+
+        Eden.getInstance().getMetadata().put("ABS_ApiKey", "mDaM8REZFo6itplNpcv1ls8J5PkwEz1wbhJ7p9po");
+        Eden.getInstance().getMetadata().put("DBT_ApiKey", "82cb00ba8a8917d05e27c99facb8ff96");
+
+        if(service.toLowerCase().equals("abs")) {
+            ABSBible myBible = new ABSBible();
+            myBible.setId(id);
+            myBible.download();
+
+            return new Reference.Builder()
+                .setBible(myBible)
+                .parseReference(input)
+                .create();
+        }
+        else if(service.toLowerCase().equals("dbp")) {
+            DBPBible myBible = new DBPBible();
+            myBible.setId(id);
+            myBible.download();
+
+            return new Reference.Builder()
+                    .setBible(myBible)
+                    .parseReference(input)
+                    .create();
         }
 
         return null;
